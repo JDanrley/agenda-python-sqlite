@@ -10,9 +10,20 @@ class Agenda(object):
 
   def view(self):
     view = cursor.execute('SELECT * FROM contatos').fetchall()
+    if len(view) > 0:
+      print('''
++---------------------------------+
+|  Contatos existentes na tabela  |
++---------------------------------+ ''')
+    else:
+      print('\nA Agenda não possui nenhum contato')
+      Agenda.pause(x)
+      Agenda.main(x)
+      
+    view = cursor.execute('SELECT * FROM contatos').fetchall()
     for i in view:
       for j in i:
-        if j == i[0]: print(f'\nContato: {j}\nNome: {i[1]}\nCelular: {i[2]}\nEmail: {i[3]}\n')
+        if j == i[0]: print(f'\nContato ID: {j}\nNome: {i[1]}\nCelular: {i[2]}\nEmail: {i[3]}\n')
     
   def gera_contato(self):
     
@@ -90,11 +101,46 @@ class Agenda(object):
     conexao.commit()
     print(f'Contato {contato[0]} armazenado com sucesso')
     Agenda.pause(x)
-    return
-      
+    
 
   def remove_contato(self):
-    print('Em desenvolvimento')
+
+    print('''
++-------------------------+
+|   Remoção de contatos   |
++-------------------------+
+''')
+    get = cursor.execute("SELECT id column from contatos").fetchall() #obtendo lista com ID's
+    
+    IDs = list()
+    
+    for i in get: #for loop que irá armazenar apenas os ID's existentes, como inteiros
+      IDs.append(int(i[0]))
+
+    Agenda.view(x)
+    
+    try:
+      
+      removido = int(input('Digite o ID do contato que deseja remover: '))
+      
+      if removido not in IDs:
+        raise ValueError
+
+    except ValueError:
+      
+      teste = input("ERRO: O valor inserido não se refere a nenhum dos ID's. Digite 'Sim' para tentar novamente: ").strip().lower()
+      if teste[0] == 's':
+        Agenda.remove_contato(x)
+
+      else:
+        Agenda.pause(x)
+
+    #Remoção do contato selecionado:
+        
+    cursor.execute(f'DELETE from contatos WHERE id = {removido}')
+    conexao.commit()
+    print(f'Contato {removido} removido com sucesso!')
+    
     Agenda.main(x)
     
   def pause(self):
@@ -105,14 +151,14 @@ class Agenda(object):
   def main(self):
         
     op = input(f'''
-      Menu de ações da agenda
-      Escolha sua ação dentre as opções abaixo:
+  Menu de ações da agenda
+  Escolha sua ação dentre as opções abaixo:
             
-      1 - Exibir contatos
-      2 - Adicionar novo contato
-      3 - Deletar contatos
-      4 - Restaurar último contato deletado
-      Insira o número referente à ação para continuar: ''').lower()
+  1 - Exibir contatos
+  2 - Adicionar novo contato
+  3 - Deletar contatos
+  4 - Restaurar último contato deletado
+  Insira o número referente à ação para continuar: ''').lower()
         
     if op == '1':
       Agenda.view(x)
@@ -121,13 +167,6 @@ class Agenda(object):
     if op == '2':
             
       Agenda.armazena_contato(x)
-            
-    if input('\nVocê deseja realizar alguma outra ação?\nResponda com "Sim" para continuar a utilizar a agenda: ').lower()[0] == 's':
-      Agenda.main(x)
-
-    else:
-      print('Obrigado por utilizar a agenda Pythônica.\nTchaaaau')
-      __name__ = '__sair__'
 
     if op == '3':
       Agenda.remove_contato(x)
@@ -135,6 +174,13 @@ class Agenda(object):
     if op == '4':
       print('Vish. Essa funcionaldiade nem comecei ainda')
       Agenda.main(x)
+
+    if input('\nVocê deseja realizar alguma outra ação?\nResponda com "Sim" para continuar a utilizar a agenda: ').lower()[0] == 's':
+      Agenda.main(x)
+
+    else:
+      print('Obrigado por utilizar a agenda Pythônica.\nTchaaaau')
+      __name__ = '__sair__'
       
 if __name__ == '__main__':
   print('Bem-vindo à Agenda Telefênonica Pythônica.\nDesenvolvida por @darlinhows')
