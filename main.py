@@ -184,9 +184,6 @@ class Agenda(object):
       
 if __name__ == '__main__':
   print('Bem-vindo à Agenda Telefênonica Pythônica.\nDesenvolvida por @darlinhows')
-  x = Agenda()
-  x.pause()
-  x.main()
   cursor.execute('''
         CREATE TABLE IF NOT EXISTS contatos (
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -197,3 +194,6 @@ if __name__ == '__main__':
 )
 ''')
   conexao.commit()
+  x = Agenda()
+  x.pause()
+  x.main()
